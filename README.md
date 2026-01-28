@@ -45,7 +45,7 @@ Flutter 3.41.0
 
 ## Screenshot
 
-![Screenshot](./images/luts.gif)
+<img src="./images/luts.gif" width="200">
 
 ## Acknowledgements
 
