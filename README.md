@@ -26,7 +26,7 @@ is used in other API calls.
 and [FragmentShader.getUniformFloat](https://github.com/flutter/flutter/blob/37f698a5b5a3ddc83bc481a7394487a390617c38/engine/src/flutter/lib/ui/painting.dart#L5766)
 \- Experimental APIs for accessing shader uniforms by name.  These are
 disabled by default since the Vulkan backend isn't implemetned yet as of
-Flutter 3.41.
+Flutter 3.41.0
 
 ## Screenshot
 
