@@ -4,6 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For AssetManifest
 import 'lut_parser.dart';
 
+// This is disabled by default since the API is experimental in 3.41. There is
+// a known bug in Vulkan that is fixed in the `main` branch. I'm not certain
+// when it will be available in a stable release.
+bool useGetUniformAPI = false;
+
 void main() {
   runApp(const MyApp());
 }
@@ -143,9 +148,6 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 /// A custom painter that applies a LUT shader to an image.
-///
-/// If [lut] is provided, it configures the shader with the image and LUT samplers
-/// and draws the filtered result. Otherwise, it draws the raw [image].
 class LutPainter extends CustomPainter {
   final ui.Image image;
   final ui.Image? lut;
@@ -156,6 +158,9 @@ class LutPainter extends CustomPainter {
   /// - [image]: The source image to be filtered.
   /// - [lut]: The flattened 2D LUT texture (e.g., 1024x32).
   /// - [program]: A compiled [ui.FragmentProgram] for the 'lut.frag' shader.
+  ///
+  /// If [lut] is provided, it configures the shader with the image and LUT samplers
+  /// and draws the filtered result. Otherwise, it draws the raw [image].
   LutPainter({required this.image, required this.lut, required this.program});
 
   @override
@@ -167,11 +172,18 @@ class LutPainter extends CustomPainter {
 
     final ui.FragmentShader shader = program.fragmentShader();
 
-    shader.setImageSampler(0, image);
-    shader.setImageSampler(1, lut!);
-    shader.setFloat(0, size.width);
-    shader.setFloat(1, size.height);
-    shader.setFloat(2, 1.0); // uIntensity
+    if (useGetUniformAPI) {
+      shader.getImageSampler('uTexture').set(image);
+      shader.getImageSampler('uLut').set(lut!);
+      shader.getUniformVec2('uSize').set(size.width, size.height);
+      shader.getUniformFloat('uIntensity').set(1.0);
+    } else {
+      shader.setImageSampler(0, image);
+      shader.setImageSampler(1, lut!);
+      shader.setFloat(0, size.width);
+      shader.setFloat(1, size.height);
+      shader.setFloat(2, 1.0); // uIntensity
+    }
 
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),

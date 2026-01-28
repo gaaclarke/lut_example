@@ -6,6 +6,8 @@ depth texture support for fragment shaders in Flutter.
 
 ## Getting Started
 
+This demo requires Flutter version >= 3.41 or the `main` channel.
+
 ```shell
 # Regenerate the platform files
 flutter create --no-overwrite .
